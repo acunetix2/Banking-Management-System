@@ -137,74 +137,7 @@ The application will start and display the login screen.
 | ViewAccount | Search and view account details |
 | AccountOperations | Core transaction management |
 
-## Project Structure
 
-```
-bankingsystem/
-├── src/
-│   ├── main/
-│   │   ├── java/com/bankingsystem/bankingsystem/
-│   │   │   ├── BankingsystemApplication.java      # Main Spring Boot entry point
-│   │   │   ├── dto/                                # Data Transfer Objects
-│   │   │   │   ├── LoginRequest.java
-│   │   │   │   └── LoginResponse.java
-│   │   │   ├── gui/                                # Swing GUI Components (2,500+ LOC)
-│   │   │   │   ├── LoginGUI.java
-│   │   │   │   ├── RegisterGUI.java
-│   │   │   │   ├── DashboardGUI.java
-│   │   │   │   ├── CreateAccountGUI.java
-│   │   │   │   ├── DepositGUI.java
-│   │   │   │   ├── WithdrawGUI.java
-│   │   │   │   ├── TransferGUI.java
-│   │   │   │   ├── ViewAccountGUI.java
-│   │   │   │   └── AccountOperationsGUI.java
-│   │   │   ├── model/                              # Data Models
-│   │   │   │   ├── User.java                       # User entity
-│   │   │   │   ├── Account.java                    # Account entity
-│   │   │   │   └── UserRole.java                   # Role enumeration
-│   │   │   ├── repository/                         # Data Access Layer
-│   │   │   │   ├── UserRepository.java
-│   │   │   │   └── AccountRepository.java
-│   │   │   ├── service/                            # Business Logic Layer (1,200+ LOC)
-│   │   │   │   ├── BankService.java                # Transaction operations
-│   │   │   │   └── UserService.java                # User management
-│   │   │   └── util/                               # Utility Classes
-│   │   │       ├── DatabaseInitializer.java        # DB setup
-│   │   │       └── InputValidation.java            # Input validation
-│   │   └── resources/
-│   │       └── application.properties              # Configuration file
-│   └── test/
-│       └── java/com/bankingsystem/bankingsystem/
-│           └── BankingsystemApplicationTests.java  # Unit tests
-├── pom.xml                                         # Maven configuration
-├── mvnw / mvnw.cmd                                 # Maven wrapper scripts
-└── README.md                                       # This file
-```
-
-## Database Schema
-
-### Users Table
-```sql
-CREATE TABLE users (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### Accounts Table
-```sql
-CREATE TABLE accounts (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    account_number VARCHAR(20) UNIQUE NOT NULL,
-    account_holder_id BIGINT NOT NULL,
-    balance DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (account_holder_id) REFERENCES users(id)
-);
-```
 
 ## Testing
 
@@ -232,15 +165,7 @@ mvn test jacoco:report
 | TC005 | Withdrawal Transaction | Pass |
 | TC006 | Fund Transfer | Pass |
 
-## Key Metrics
 
-- **Total Lines of Code**: 3,500+
-- **GUI Components**: 10 classes
-- **Service Classes**: 2 classes
-- **Repository Classes**: 2 classes
-- **Database Tables**: 2 tables
-- **Supported User Roles**: 3 roles
-- **Transaction Types**: 4 (Create Account, Deposit, Withdraw, Transfer)
 
 ## Team Contributions
 
@@ -371,41 +296,7 @@ mvn spring-boot:run
 - Audit logging and compliance tracking
 - Real-time notifications
 
-## System Requirements
 
-### Minimum
-- RAM: 2 GB
-- Storage: 500 MB
-- CPU: Dual Core 2.0 GHz
-
-### Recommended
-- RAM: 4 GB+
-- Storage: 1 GB
-- CPU: Quad Core 2.5 GHz+
-
-## Configuration Details
-
-### application.properties
-
-```properties
-# Spring Application
-spring.application.name=bankingsystem
-
-# Database Configuration
-spring.datasource.url=jdbc:mysql://localhost:3306/banking_db?createDatabaseIfNotExist=true
-spring.datasource.username=root
-spring.datasource.password=password
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-
-# JPA/Hibernate
-spring.jpa.hibernate.ddl-auto=create-drop
-spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
-spring.jpa.show-sql=false
-spring.jpa.properties.hibernate.format_sql=true
-
-# Server
-server.port=8080
-```
 
 ## License
 
