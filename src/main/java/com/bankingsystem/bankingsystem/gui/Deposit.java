@@ -3,174 +3,51 @@ package com.bankingsystem.bankingsystem.gui;
 import com.bankingsystem.bankingsystem.service.BankService;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class Deposit extends JDialog {
 
-    private JTextField txtAccountNumber;
-    private JTextField txtAmount;
-    private BankService bankService;
-
-    private final Font FIELD_FONT = new Font("Segoe UI", Font.PLAIN, 13);
-    private final Font LABEL_FONT = new Font("Segoe UI", Font.PLAIN, 11);
-    private final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 20);
-    private final Font BUTTON_FONT = new Font("Segoe UI", Font.BOLD, 13);
-    private final Color PRIMARY_COLOR = new Color(33, 150, 243);
-    private final Color SUCCESS_COLOR = new Color(76, 175, 80);
-    private final Color GRAY_BG = new Color(245, 245, 245);
-
     public Deposit(BankService bankService) {
-        this.bankService = bankService;
-
         setTitle("Deposit Money");
-        setSize(500, 380);
+        setSize(350, 200);
         setLocationRelativeTo(null);
         setModal(true);
-        setResizable(false);
+        setResizable(true);
 
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBackground(GRAY_BG);
-        mainPanel.setBorder(new EmptyBorder(30, 30, 30, 30));
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(0, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JLabel titleLabel = new JLabel("Deposit Funds");
-        titleLabel.setFont(TITLE_FONT);
-        titleLabel.setForeground(PRIMARY_COLOR);
-        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mainPanel.add(titleLabel);
-        mainPanel.add(Box.createVerticalStrut(10));
+        JLabel accLabel = new JLabel("Account Number:");
+        JTextField accField = new JTextField();
 
-        JLabel subtitleLabel = new JLabel("Add money to your account");
-        subtitleLabel.setFont(LABEL_FONT);
-        subtitleLabel.setForeground(new Color(100, 100, 100));
-        subtitleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mainPanel.add(subtitleLabel);
-        mainPanel.add(Box.createVerticalStrut(25));
+        JLabel amountLabel = new JLabel("Amount:");
+        JTextField amountField = new JTextField();
 
-        JPanel formCard = createFormCard();
-        mainPanel.add(formCard);
+        JButton depositBtn = new JButton("Deposit");
+        depositBtn.addActionListener(e -> {
+            try {
+                long accountNo = Long.parseLong(accField.getText().trim());
+                double amount = Double.parseDouble(amountField.getText().trim());
 
-        add(mainPanel);
-    }
-
-    private JPanel createFormCard() {
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
-            new EmptyBorder(25, 25, 25, 25)
-        ));
-
-        JLabel accLabel = new JLabel("Account Number");
-        accLabel.setFont(LABEL_FONT);
-        accLabel.setForeground(new Color(80, 80, 80));
-        accLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        card.add(accLabel);
-        card.add(Box.createVerticalStrut(8));
-
-        txtAccountNumber = new JTextField();
-        txtAccountNumber.setFont(FIELD_FONT);
-        txtAccountNumber.setBackground(GRAY_BG);
-        txtAccountNumber.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
-            new EmptyBorder(10, 10, 10, 10)
-        ));
-        txtAccountNumber.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        card.add(txtAccountNumber);
-        card.add(Box.createVerticalStrut(18));
-
-        JLabel amountLabel = new JLabel("Deposit Amount");
-        amountLabel.setFont(LABEL_FONT);
-        amountLabel.setForeground(new Color(80, 80, 80));
-        amountLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        card.add(amountLabel);
-        card.add(Box.createVerticalStrut(8));
-
-        txtAmount = new JTextField();
-        txtAmount.setFont(FIELD_FONT);
-        txtAmount.setBackground(GRAY_BG);
-        txtAmount.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
-            new EmptyBorder(10, 10, 10, 10)
-        ));
-        txtAmount.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        card.add(txtAmount);
-        card.add(Box.createVerticalStrut(25));
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
-        buttonPanel.setBackground(Color.WHITE);
-        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
-
-        JButton btnCancel = createButton("Cancel", new Color(158, 158, 158));
-        btnCancel.addActionListener(e -> dispose());
-
-        JButton btnDeposit = createButton("Deposit", SUCCESS_COLOR);
-        btnDeposit.addActionListener(e -> deposit());
-
-        buttonPanel.add(btnCancel);
-        buttonPanel.add(btnDeposit);
-        card.add(buttonPanel);
-
-        return card;
-    }
-
-    private JButton createButton(String text, Color bgColor) {
-        JButton btn = new JButton(text);
-        btn.setFont(BUTTON_FONT);
-        btn.setBackground(bgColor);
-        btn.setForeground(Color.WHITE);
-        btn.setFocusPainted(false);
-        btn.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setPreferredSize(new Dimension(110, 40));
-        return btn;
-    }
-
-    private void deposit() {
-        String accountStr = txtAccountNumber.getText().trim();
-        String amountStr = txtAmount.getText().trim();
-
-        if (accountStr.isEmpty() || amountStr.isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Please fill in all fields.", 
-                "Missing Information", 
-                JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        try {
-            long accountNo = Long.parseLong(accountStr);
-            double amount = Double.parseDouble(amountStr);
-
-            if (amount <= 0) {
-                JOptionPane.showMessageDialog(this, 
-                    "Amount must be greater than zero.", 
-                    "Invalid Amount", 
-                    JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            String result = bankService.deposit(accountNo, amount);
-            
-            if (result.contains("successful")) {
-                JOptionPane.showMessageDialog(this, 
-                    result, 
-                    "Success", 
-                    JOptionPane.INFORMATION_MESSAGE);
+                String result = bankService.deposit(accountNo, amount);
+                JOptionPane.showMessageDialog(this, result, "Deposit", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, 
-                    result, 
-                    "Deposit Failed", 
-                    JOptionPane.ERROR_MESSAGE);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Invalid input.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, 
-                "Invalid account number or amount.", 
-                "Input Error", 
-                JOptionPane.ERROR_MESSAGE);
-        }
+        });
+
+        JButton closeBtn = new JButton("Close");
+        closeBtn.addActionListener(e -> dispose());
+
+        panel.add(accLabel);
+        panel.add(accField);
+        panel.add(amountLabel);
+        panel.add(amountField);
+        panel.add(depositBtn);
+        panel.add(closeBtn);
+
+        add(panel);
     }
 }

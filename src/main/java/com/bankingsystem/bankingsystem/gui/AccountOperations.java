@@ -3,166 +3,97 @@ package com.bankingsystem.bankingsystem.gui;
 import com.bankingsystem.bankingsystem.service.BankService;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class AccountOperations extends JDialog {
-
-    private JTextField txtAccountNumber;
+    private JTextField txtAccNo;
     private JTextField txtAmount;
-    private JLabel lblMessage;
+    private JLabel lblMsg;
     private BankService bankService;
-
-    private final Font FIELD_FONT = new Font("Segoe UI", Font.PLAIN, 12);
-    private final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 16);
-    private final Color PRIMARY_COLOR = new Color(33, 150, 243);
-    private final Color SUCCESS_COLOR = new Color(76, 175, 80);
-    private final Color DANGER_COLOR = new Color(244, 67, 54);
-    private final Color ERROR_COLOR = new Color(244, 67, 54);
 
     public AccountOperations(BankService bankService) {
         this.bankService = bankService;
 
-        setTitle("Account Operations");
-        setSize(450, 350);
+        setTitle("Deposit or Withdraw");
+        setSize(400, 220);
         setLocationRelativeTo(null);
         setModal(true);
-        setResizable(false);
+        setResizable(true);
 
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBackground(Color.WHITE);
-        mainPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        JPanel main = new JPanel(new GridLayout(3, 2, 10, 10));
+        main.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        main.setBackground(new Color(240, 240, 240));
 
-        JLabel titleLabel = new JLabel("Deposit or Withdraw");
-        titleLabel.setFont(TITLE_FONT);
-        titleLabel.setForeground(PRIMARY_COLOR);
-        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mainPanel.add(titleLabel);
-        mainPanel.add(Box.createVerticalStrut(20));
+        main.add(new JLabel("Account Number:"));
+        txtAccNo = new JTextField();
+        main.add(txtAccNo);
 
-        JPanel accountPanel = new JPanel(new BorderLayout(8, 0));
-        accountPanel.setBackground(Color.WHITE);
-        accountPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-        JLabel accLabel = new JLabel("Account Number:");
-        accLabel.setFont(FIELD_FONT);
-        accLabel.setPreferredSize(new Dimension(130, 20));
-        txtAccountNumber = new JTextField();
-        txtAccountNumber.setFont(FIELD_FONT);
-        JButton btnSearch = createButton("Search", PRIMARY_COLOR);
-        btnSearch.setPreferredSize(new Dimension(80, 30));
-        btnSearch.addActionListener(e -> searchAccount());
-        accountPanel.add(accLabel, BorderLayout.WEST);
-        accountPanel.add(txtAccountNumber, BorderLayout.CENTER);
-        accountPanel.add(btnSearch, BorderLayout.EAST);
-        mainPanel.add(accountPanel);
-        mainPanel.add(createFieldPanel("Amount:", txtAmount = new JTextField()));
+        main.add(new JLabel("Amount:"));
+        txtAmount = new JTextField();
+        main.add(txtAmount);
 
-        mainPanel.add(Box.createVerticalStrut(20));
+        main.add(new JLabel("Status:"));
+        lblMsg = new JLabel("");
+        lblMsg.setForeground(new Color(244, 67, 54));
+        main.add(lblMsg);
 
-        lblMessage = new JLabel("");
-        lblMessage.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblMessage.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mainPanel.add(lblMessage);
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 0));
+        btnPanel.setBackground(new Color(240, 240, 240));
 
-        mainPanel.add(Box.createVerticalStrut(15));
+        JButton deposit = styleButton(new JButton("Deposit"), new Color(76, 175, 80));
+        deposit.addActionListener(e -> operation(true));
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        buttonPanel.setBackground(Color.WHITE);
+        JButton withdraw = styleButton(new JButton("Withdraw"), new Color(244, 67, 54));
+        withdraw.addActionListener(e -> operation(false));
 
-        JButton btnDeposit = createButton("Deposit", SUCCESS_COLOR);
-        btnDeposit.addActionListener(e -> deposit());
+        JButton cancel = styleButton(new JButton("Cancel"), new Color(158, 158, 158));
+        cancel.addActionListener(e -> dispose());
 
-        JButton btnWithdraw = createButton("Withdraw", DANGER_COLOR);
-        btnWithdraw.addActionListener(e -> withdraw());
+        btnPanel.add(deposit);
+        btnPanel.add(withdraw);
+        btnPanel.add(cancel);
 
-        JButton btnCancel = createButton("Cancel", new Color(158, 158, 158));
-        btnCancel.addActionListener(e -> dispose());
+        JPanel container = new JPanel(new BorderLayout());
+        container.add(main, BorderLayout.CENTER);
+        container.add(btnPanel, BorderLayout.SOUTH);
 
-        buttonPanel.add(btnDeposit);
-        buttonPanel.add(btnWithdraw);
-        buttonPanel.add(btnCancel);
-        mainPanel.add(buttonPanel);
-
-        add(mainPanel);
+        add(container);
     }
 
-    private JPanel createFieldPanel(String label, JTextField field) {
-        JPanel panel = new JPanel(new BorderLayout(10, 0));
-        panel.setBackground(Color.WHITE);
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-
-        JLabel lbl = new JLabel(label);
-        lbl.setFont(FIELD_FONT);
-        lbl.setPreferredSize(new Dimension(130, 20));
-
-        field.setFont(FIELD_FONT);
-
-        panel.add(lbl, BorderLayout.WEST);
-        panel.add(field, BorderLayout.CENTER);
-
-        return panel;
+    private void operation(boolean isDeposit) {
+        try {
+            long accNo = Long.parseLong(txtAccNo.getText().trim());
+            double amt = Double.parseDouble(txtAmount.getText().trim());
+            String result = isDeposit ? bankService.deposit(accNo, amt) : bankService.withdraw(accNo, amt);
+            if (result.contains("successful")) {
+                lblMsg.setForeground(new Color(76, 175, 80));
+                lblMsg.setText("Success " + result);
+                new Timer(2000, e -> dispose()).start();
+            } else {
+                lblMsg.setForeground(new Color(244, 67, 54));
+                lblMsg.setText("Invalid " + result);
+            }
+        } catch (NumberFormatException e) {
+            lblMsg.setForeground(new Color(244, 67, 54));
+            lblMsg.setText("Invalid input");
+        }
     }
 
-    private JButton createButton(String text, Color bgColor) {
-        JButton btn = new JButton(text);
+    private JButton styleButton(JButton btn, Color bgColor) {
         btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btn.setBackground(bgColor);
         btn.setForeground(Color.WHITE);
         btn.setFocusPainted(false);
-        btn.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+        btn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btn.setBackground(new Color(Math.max(0, bgColor.getRed() - 15), Math.max(0, bgColor.getGreen() - 15), Math.max(0, bgColor.getBlue() - 15)));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btn.setBackground(bgColor);
+            }
+        });
         return btn;
     }
-
-    private void deposit() {
-        try {
-            long accountNo = Long.parseLong(txtAccountNumber.getText().trim());
-            double amount = Double.parseDouble(txtAmount.getText().trim());
-
-            String result = bankService.deposit(accountNo, amount);
-            
-            if (result.contains("successful")) {
-                showSuccess(result);
-                new Timer(2000, e -> dispose()).start();
-            } else {
-                showError(result);
-            }
-        } catch (NumberFormatException e) {
-            showError("Invalid input");
-        }
-    }
-
-    private void withdraw() {
-        try {
-            long accountNo = Long.parseLong(txtAccountNumber.getText().trim());
-            double amount = Double.parseDouble(txtAmount.getText().trim());
-
-            String result = bankService.withdraw(accountNo, amount);
-            
-            if (result.contains("successful")) {
-                showSuccess(result);
-                new Timer(2000, e -> dispose()).start();
-            } else {
-                showError(result);
-            }
-        } catch (NumberFormatException e) {
-            showError("Invalid input");
-        }
-    }
-
-    private void showError(String message) {
-        lblMessage.setForeground(ERROR_COLOR);
-        lblMessage.setText(message);
-    }
-
-    private void showSuccess(String message) {
-        lblMessage.setForeground(new Color(76, 175, 80));
-        lblMessage.setText(message);
-    }
-
-    private void searchAccount() {
-        // Stub method - can be implemented later if needed
-    }
 }
-

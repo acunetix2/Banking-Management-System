@@ -50,10 +50,7 @@ public class Account {
 
     @Override
     public String toString() {
-        return "Account Number: " + account_no +
-               ", Account Type: " + account_type +
-               ", Account Name: " + account_name +
-               ", Account Balance: " + account_balance;
+        return String.format("Account{account_no=%d, account_type='%s', account_name='%s', account_balance=%.2f}", account_no, account_type, account_name, account_balance);
     }
 }
 

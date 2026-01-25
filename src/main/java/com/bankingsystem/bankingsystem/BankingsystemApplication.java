@@ -28,9 +28,9 @@ public class BankingsystemApplication {
             try {
                 Login loginGUI = new Login(userService, context, bankService);
                 loginGUI.setVisible(true);
-                System.out.println("\nBanking System GUI launched successfully!");
+                System.out.println("\nSystem is Live!");
             } catch (Exception e) {
-                System.err.println("Failed to initialize GUI: " + e.getMessage());
+                System.err.println("System Failure: " + e.getMessage());
                 e.printStackTrace();
                 context.close();
                 System.exit(1);

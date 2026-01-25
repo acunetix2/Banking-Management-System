@@ -16,7 +16,7 @@ public class DatabaseInitializer implements CommandLineRunner {
         createTablesIfNotExist();
         addMissingColumns();
     }
-
+//SQL portable statements to create tables
     private void createTablesIfNotExist() {
         String createUsersTable = "CREATE TABLE IF NOT EXISTS users (" +
                 "user_id INT AUTO_INCREMENT PRIMARY KEY," +
@@ -81,7 +81,6 @@ public class DatabaseInitializer implements CommandLineRunner {
                 if (columnType != null && columnType.contains("int")) {
                     String modifyAccountNo = "ALTER TABLE accounts MODIFY COLUMN account_no BIGINT";
                     jdbcTemplate.execute(modifyAccountNo);
-                    System.out.println("Modified account_no column to BIGINT in accounts table");
                 }
             } catch (Exception e) {
                 System.out.println("account_no column already BIGINT or table not found");
